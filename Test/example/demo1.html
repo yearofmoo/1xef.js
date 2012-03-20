@@ -1,0 +1,63 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+<title>Untitled Document</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> 
+<meta http-equiv="imagetoolbar" content="no" /> 
+<link rel="shortcut icon" href="/favikon.ico" /> 
+<link rel="stylesheet" type="text/css" href="../../Source/xef.css" /> 
+<!--[if IE]>
+<link rel="stylesheet" type="text/css" media="all" href="/stylesheets/ie.css" />
+<![endif]--> 
+<style type="text/css">
+body {
+  margin:0;
+  padding:0;
+}
+#page-menu {
+  position:fixed;
+  top:0;
+  bottom:0;
+  width:200px;
+  background:#eee;
+}
+#page-manager {
+  margin-left:200px;
+  min-height:1200px;
+}
+</style>
+</head> 
+
+<body id="" class=""> 
+  <div id="wrapper">
+    <div id="page-menu">
+      <a id="new-page" href="#">New Page</a>
+    </div>
+    <div id="page-manager">
+
+    </div> 
+  </div>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/mootools/1.4.5/mootools-yui-compressed.js"></script>
+<script type="text/javascript" src="../Assets/MooTools-more.js"></script>
+<script type="text/javascript" src="../../Source/xef.js?123123"></script>
+<script type="text/javascript">
+window.addEvent('domready',function() {
+  var manager = new Xef('page-manager',{
+
+  });
+
+  var page = manager.createPage('hospital');
+
+  $('new-page').addEvent('click',function(event) {
+    event.stop();
+    var r = new Date().getTime();
+    var p = manager.createPage(r+'oajsdoajsdoajsdojasdojasdoj aojas doajsd ');
+    p.load('./demo1_page_random.php');
+  });
+
+  page.load('./demo1_page.php');
+
+});
+</script>
+</body>
+</html> 

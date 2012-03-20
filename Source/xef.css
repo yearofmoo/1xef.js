@@ -1,0 +1,74 @@
+.xef-page {
+  border-left:10px solid #ddd;
+  background:white;
+  box-shadow:0 0 5px #ddd;
+}
+
+.xef-inner {
+  position:relative;
+  overflow:auto;
+  min-height:100%;
+}
+
+.xef-page.disabled {
+  border-left-color:#eee;
+
+}
+
+.xef-page.loading {
+  background:url(./images/loading.gif) 20px 20px no-repeat;
+}
+
+.xef-page-response {
+  padding:1em;
+}
+
+.xef-page.hover {
+  background:#eee;
+  cursor:pointer;
+}
+
+.xef-page.disabled {
+  color:#eee;
+}
+
+.xef-page.disabled:after {
+  position:absolute;
+  top:0;
+  left:0;
+  bottom:0;
+  right:0;
+  content:"";
+  background:#ddd;
+  opacity:0.2;
+}
+
+.xef-page.disabled:hover:after {
+  opacity:0;
+}
+
+.xef-tab {
+  transform-origin: 0 0;
+  -webkit-transform-origin: 0 0;
+  -moz-transform-origin: 0 0;
+  transform: rotate(-90deg);
+  -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+  position:absolute;
+  background:#ddd;
+  padding:5px 30px;
+  box-shadow:0 0 5px #ddd;
+  color:white;
+  border-top-left-radius:8px;
+  border-top-right-radius:8px;
+}
+
+.xef-page.active .xef-tab {
+  background:#ddd;
+}
+
+.xef-page.disabled .xef-tab {
+  background:#ddd;
+  opacity:0.5;
+}
