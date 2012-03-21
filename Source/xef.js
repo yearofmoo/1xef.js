@@ -796,10 +796,11 @@ Xef.Page.implement({
   disable : function() {
     if(!this.isAnimating()) {
       var container = this.getContainer();
-      var x = container.getPosition().x;
+      var pos = container.getPosition();
       container.setStyles({
         'position':'fixed',
-        'left':x
+        'left':pos.x,
+        'top':pos.y
       });
       container.addClass(this.options.disabledClassName).removeClass(this.options.activatedClassName);
       this.onDisable();
