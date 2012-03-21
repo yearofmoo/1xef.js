@@ -1102,6 +1102,7 @@ Xef.Page.Response = new Class({
     var content = header.get('html').trim();
     var headerData = JSON.decode(content);
     this.header = headerData['xef'];
+    header.destroy();
   },
 
   getRawHTML : function() {
