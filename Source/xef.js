@@ -632,8 +632,7 @@ Xef.Page.implement({
   setupEvents : function() {
     this.getContainer().addEvents({
       'mouseenter':this.onHover.bind(this),
-      'mouseleave':this.onBlur.bind(this),
-      'click':this.onClick.bind(this)
+      'mouseleave':this.onBlur.bind(this)
     });
   },
 
@@ -813,7 +812,13 @@ Xef.Page.implement({
           'left':0,
           'bottom':0,
           'right':0
-        } 
+        },
+        'events':{
+          'click':function(event) {
+            event.stop();
+            this.onClick();
+          }.bind(this)
+        }
       }).inject(this.getContainer());
       this.screen.setOpacity(this.options.screenOpacity);
     }
@@ -840,9 +845,11 @@ Xef.Page.implement({
   enable : function() {
     if(!this.isAnimating()) {
       var container = this.getContainer();
+      var y = 0;
       var x = this.getOrigin();
       container.setStyles({
         'position':'absolute',
+        'top':y,
         'left':x
       });
       container.removeClass(this.options.disabledClassName).addClass(this.options.activatedClassName);
