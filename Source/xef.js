@@ -2,8 +2,8 @@ var Xef = new Class;
 
 Xef.extend({
 
-  loadAssets : function(pageID,assets,onReady,onError) {
-    Xef.Assets.loadAssets(pageID,assets,onReady,onError);
+  loadAssets : function(pageID,assets,stamp,onReady,onError) {
+    Xef.Assets.loadAssets(pageID,assets,stamp,onReady,onError);
   },
 
   clearAssets : function(pageID) {
@@ -53,7 +53,7 @@ Xef.Assets = {
     return url.replace(/[-_\W\s\.]+/g,' ').trim().toLowerCase().replace(/\s+/g,'-');
   },
 
-  loadAssets : function(pageID,assets,onReady,onError) {
+  loadAssets : function(pageID,assets,stamp,onReady,onError) {
     var total = assets.length;
     var counter = 0;
 
@@ -74,7 +74,7 @@ Xef.Assets = {
 
     for(var i=0;i<assets.length;i++) {
       var asset = assets[i];
-      this.loadAsset(pageID,asset,onAssetReady,onAssetFailure);
+      this.loadAsset(pageID,asset,stamp,onAssetReady,onAssetFailure);
     }
   },
 
@@ -85,12 +85,14 @@ Xef.Assets = {
    *  pageSpecific : true
    * }
    */
-  loadAsset : function(pageID,asset,onReady,onError) {
+  loadAsset : function(pageID,asset,stamp,onReady,onError) {
     asset = this.getAssetObject(asset);
     if(asset.loaded) {
       onReady();
       return;
     }
+
+    asset.url += (asset.url.contains('?') ? '&' : '?') + stamp;
 
     switch(asset.type) {
       case 'js':
@@ -183,7 +185,11 @@ Xef.implement({
     gutter : 100,
     showLoadingOnCreate : true,
     fadeGap : 150,
-    urlFormat : 'xefjs'
+    urlFormat : 'xefjs',
+    assetStamp : null,
+    pageOptions : {
+
+    }
   },
 
   initialize : function(container,options) {
@@ -255,7 +261,9 @@ Xef.implement({
     var index = this.getNextPageIndex();
     var zIndex = this.getZIndexValue(index);
     var width = this.calculatePageWidth(index);
-    var page = new Xef.Page(name,this.getContainer(),width,zIndex);
+    var options = this.options.pageOptions;
+    options.assetStamp = this.options.assetStamp;
+    var page = new Xef.Page(name,this.getContainer(),width,zIndex,options);
     page.setLevel(index);
     this.addPage(page);
 
@@ -681,7 +689,7 @@ Xef.Page.implement({
   onResponse : function(response) {
     this.setResponse(response);
     if(this.options.loadAssets) {
-      this.getRequest().loadAssets(this.getID());
+      this.getRequest().loadAssets(this.getID(),this.options.assetStamp);
     }
     else {
       this.onReady();
@@ -1237,10 +1245,10 @@ Xef.Page.Request = new Class({
     this.fireEvent('failure');
   },
 
-  loadAssets : function(pageID) {
+  loadAssets : function(pageID,stamp) {
     var assets = this.getAssets();
     if(assets && assets.length > 0) {
-      Xef.loadAssets(pageID,assets,this.onAssetsReady.bind(this),this.onAssetsError.bind(this));
+      Xef.loadAssets(pageID,assets,stamp,this.onAssetsReady.bind(this),this.onAssetsError.bind(this));
     }
     else {
       this.onAssetsReady();
