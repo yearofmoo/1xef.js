@@ -209,8 +209,8 @@ Xef.implement({
   },
 
   buildChildFromContent : function(content) {
-    var page = Xef.Page.createFromContent(content);
-    this.addPage(page);
+    var page = this.createPage(content);
+    page.hideLoading();
   },
 
   setupEvents : function() {
@@ -437,10 +437,6 @@ Xef.Page.extend({
 
   callbacks : {},
 
-  createFromContent : function(element,options) {
-    var frameContainer = element.getParent();
-  },
-
   bindCallbackScopeToPage : function(pageID) {
     this._on = this._on ? this._on : this.on;
     this.on = function(events) {
@@ -513,23 +509,59 @@ Xef.Page.implement({
 
   initialize : function(name,frameContainer,maxWidth,zIndex,options) {
     this.setOptions(options);
-    this.name = name;
+    this.parent = document.id(frameContainer);
     this.maxWidth = maxWidth;
     this.zIndex = zIndex;
-    this.id = name + '-' + (new Date().getTime());
-    this.parent = document.id(frameContainer);
-    this.build(this.parent);
+
+    if(typeOf(name) == 'element') {
+      this.buildFromElement(name);
+    }
+    else {
+      this.name = name;
+      this.id = this.generateID(name);
+      this.build(this.parent);
+    }
+
     this.hide();
     this.setupEvents();
     this.resize();
+  },
+
+  generateID : function(name) {
+    return name + '-' + (new Date().getTime());
   },
 
   setLevel : function(level) {
     this.getContainer().addClass('xef-page-level-'+level);
   },
 
+  buildFromElement : function(element) {
+
+    this.name = element.get('data-xef-title');
+    this.container = document.id(element);
+    this.buildContainer();
+
+    this.inner = this.container.getElement('.xef-inner');
+
+    this.id = this.generateID(name);
+    this.buildInner();
+    this.buildTab();
+
+    var url = element.get('data-xef-url');
+  },
+
   build : function(frameContainer) {
-    this.container = new Element('div',{
+    this.buildContainer(frameContainer);
+    this.buildInner();
+    this.buildTab();
+  },
+
+  buildContainer : function(frameContainer) {
+    if(!this.container && frameContainer) {
+      this.container = new Element('div').inject(frameContainer);
+    }
+
+    this.container.set({
       'class':Xef.Page.KLASS,
       'styles':{
         'position':'absolute',
@@ -540,15 +572,28 @@ Xef.Page.implement({
         'min-height':'100%',
         'z-index':this.zIndex
       }
-    }).inject(frameContainer);
+    });
+  },
 
-    this.inner = new Element('div.xef-inner',{
+  buildInner : function() {
+    if(!this.inner) {
+      this.inner = new Element('div').inject(this.getContainer());
+    }
+
+    this.inner.set({
+      'class':'xef-inner',
       'styles':{
         'width':this.maxWidth
       }
-    }).inject(this.container)
+    });
+  },
 
-    this.tab = new Element('div.xef-tab').inject(this.container);
+  buildTab : function() {
+    if(!this.tab) {
+      this.tab = new Element('div').inject(this.getContainer());
+    }
+
+    this.tab.set('class','xef-tab');
     this.setTabTitle(this.getName());
   },
 

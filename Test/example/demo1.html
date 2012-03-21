@@ -35,6 +35,26 @@ body {
     </div>
     <div id="page-manager">
 
+      <div class="xef-page" data-xef-title="New Page">
+        <div class="xef-inner">
+          <div class="xef-page-response">
+            <div class="xef-content">
+              Something
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="xef-page" data-xef-title="New Page 2">
+        <div class="xef-inner">
+          <div class="xef-page-response">
+            <div class="xef-content">
+              Something 2
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div> 
   </div>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/mootools/1.4.5/mootools-yui-compressed.js"></script>
@@ -47,16 +67,12 @@ window.addEvent('domready',function() {
 
   });
 
-  var page = manager.createPage('hospital');
-
   $('new-page').addEvent('click',function(event) {
     event.stop();
     var r = new Date().getTime();
     var p = manager.createPage(r+'oajsdoajsdoajsdojasdojasdoj aojas doajsd ');
     p.load('./demo1_page_random.php?123');
   });
-
-  page.load('./demo1_page.php');
 
 });
 </script>
