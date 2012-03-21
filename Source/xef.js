@@ -178,7 +178,6 @@ Xef.implement({
 
   options : {
     recognizeExistingChildren : true,
-    bindEscapeKey : true,
     animateOnCreate : true,
     animateOnDestroy : true,
     zIndexIncrement : 100,
@@ -201,7 +200,6 @@ Xef.implement({
     this.container = $(container || document.body);
     this.setOptions(options);
     this.build();
-    this.setupEvents();
     if(this.options.recognizeExistingChildren) {
       this.buildFromChildren();
     }
@@ -221,12 +219,6 @@ Xef.implement({
   buildChildFromContent : function(content) {
     var page = this.createPage(content);
     page.hideLoading();
-  },
-
-  setupEvents : function() {
-    if(this.options.bindEscapeKey) {
-      document.addEvent('keypress',this.onEscape.bind(this));
-    }
   },
 
   getContainer : function() {
