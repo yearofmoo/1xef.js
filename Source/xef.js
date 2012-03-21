@@ -456,7 +456,7 @@ Xef.Page.extend({
     if(!pageID) {
       var manager = Xef.getInstance();
       var page = manager.getTipPage();
-      var id = page.getID();
+      pageID = page.getID();
     }
     this.registerCallbacks(pageID,events);
   },
