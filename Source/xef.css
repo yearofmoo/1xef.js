@@ -41,10 +41,6 @@
   left:0;
 }
 
-.xef-page-response {
-  padding:1em;
-}
-
 .xef-page.hover {
   border-left-color:#ccc;
   cursor:pointer;

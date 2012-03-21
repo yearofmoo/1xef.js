@@ -591,15 +591,28 @@ Xef.Page.implement({
   buildTab : function() {
     if(!this.tab) {
       this.tab = new Element('div').inject(this.getContainer());
+      this.hideTab();
     }
 
     this.tab.set('class','xef-tab');
-    this.setTabTitle(this.getName());
+    var name = this.getName();
+    if(name) {
+      this.setTabTitle(name);
+      this.showTab();
+    }
   },
 
   setTabTitle : function(title) {
     this.getTab().set('html',title);
     this.positionTab();
+  },
+
+  hideTab : function() {
+    this.getTab().setStyle('display','none');
+  },
+
+  showTab : function() {
+    this.getTab().setStyle('display','block');
   },
 
   positionTab : function() {
@@ -714,6 +727,7 @@ Xef.Page.implement({
     container.adopt(content);
     if(title) {
       this.setTabTitle(title);
+      this.showTab();
     }
 
     var className = response.getClassName() || '';
