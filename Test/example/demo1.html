@@ -39,7 +39,8 @@ body {
   </div>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/mootools/1.4.5/mootools-yui-compressed.js"></script>
 <script type="text/javascript" src="../Assets/MooTools-more.js"></script>
-<script type="text/javascript" src="../../Source/xef.js?123123"></script>
+<script type="text/javascript" src="../Assets/MooTools-Asset.stylesheet-patch/Source/Asset.stylesheet.js"></script>
+<script type="text/javascript" src="../../Source/xef.js?123121233"></script>
 <script type="text/javascript">
 window.addEvent('domready',function() {
   var manager = new Xef('page-manager',{
@@ -52,7 +53,7 @@ window.addEvent('domready',function() {
     event.stop();
     var r = new Date().getTime();
     var p = manager.createPage(r+'oajsdoajsdoajsdojasdojasdoj aojas doajsd ');
-    p.load('./demo1_page_random.php');
+    p.load('./demo1_page_random.php?123');
   });
 
   page.load('./demo1_page.php');

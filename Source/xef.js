@@ -2,13 +2,34 @@ var Xef = new Class;
 
 Xef.extend({
 
-  loadAssets : function(assets,onReady,onError) {
-    Xef.Assets.loadAssets(assets,onReady,onError);
+  loadAssets : function(pageID,assets,onReady,onError) {
+    Xef.Assets.loadAssets(pageID,assets,onReady,onError);
+  },
+
+  clearAssets : function(pageID) {
+    Xef.Assets.clearPageSpecific(pageID);
+  },
+
+  clearAllAssets : function(pageID) {
+    $$('.xef-page-specific').destroy();
+  },
+
+  getInstance : function() {
+    return this.instance;
+  },
+
+  registerInstance : function(instance) {
+    this.instance = instance;
   }
 
 });
 
 Xef.Assets = {
+
+  clearPageSpecific : function(pageID) {
+    var s = '.' + this.generatePageSpecificAssetClassName(pageID);
+    $$(s).destroy();
+  },
 
   getAssetElement : function(asset) {
     return document.id(this.generateIDFromAsset(asset));
@@ -19,23 +40,42 @@ Xef.Assets = {
   },
 
   generateIDFromAsset : function(asset) {
-    asset = this.getAsset(asset);
-    var name = this.parameterizeAssetURL(asset.url);
+    asset = this.getAssetObject(asset);
+    var name = this.parameterizeAssetString(asset.url);
     return 'asset-'+asset.type+'-'+name;
   },
 
-  parameterizeAssetURL : function(url) {
-    return url.replace(/[\W\s-_]+/,' ').trim().toLowerCase().replace(/\ +/,'-');
+  generatePageSpecificAssetClassName : function(pageID) {
+    return 'xef-page-asset-'+this.parameterizeAssetString(pageID);
   },
 
-  loadAssets : function(assets,onReady,onError) {
+  parameterizeAssetString : function(url) {
+    return url.replace(/[-_\W\s\.]+/g,' ').trim().toLowerCase().replace(/\s+/g,'-');
+  },
+
+  loadAssets : function(pageID,assets,onReady,onError) {
+    var total = assets.length;
+    var counter = 0;
+
     var onAllReady = function() {
       onReady();
     };
 
     var onAssetReady = function(asset) {
-      asset = this.getAsset(asset);
+      counter++;
+      if(counter >= total) {
+        onAllReady();
+      }
     }.bind(this);
+
+    var onAssetFailure = function(asset) {
+      onAssetReady(asset);
+    };
+
+    for(var i=0;i<assets.length;i++) {
+      var asset = assets[i];
+      this.loadAsset(pageID,asset,onAssetReady,onAssetFailure);
+    }
   },
 
   /*
@@ -45,14 +85,19 @@ Xef.Assets = {
    *  pageSpecific : true
    * }
    */
-  loadAsset : function(asset,onReady,onError) {
+  loadAsset : function(pageID,asset,onReady,onError) {
     asset = this.getAssetObject(asset);
-    switch(type) {
+    if(asset.loaded) {
+      onReady();
+      return;
+    }
+
+    switch(asset.type) {
       case 'js':
-        this.loadJavaScript(asset,onReady,onError);
+        this.loadJavaScript(pageID,asset,onReady,onError);
       break;
       case 'css':
-        this.loadStylesheet(asset,onReady,onError);
+        this.loadStyleSheet(pageID,asset,onReady,onError);
       break;
       default:
         onReady();
@@ -65,7 +110,7 @@ Xef.Assets = {
   },
 
   getAssetType : function(asset) {
-    return this.getAssetExtension(asset).toLowerCase();
+    return this.getAssetExtension(asset).toLowerCase().substr(1);
   },
 
   getAssetObject : function(asset) {
@@ -76,35 +121,39 @@ Xef.Assets = {
         pageSpecific : true
       };
     }
+    asset.loaded = false; //#!
     return asset;
   },
 
-  generateAssetClassName : function(asset) {
+  generateAssetClassName : function(pageID,asset) {
     asset = this.getAssetObject(asset);
     var className = 'xef-asset xef-asset-' + asset.type;
     if(asset.pageSpecific) {
       className += ' xef-page-specific';
+      className += ' ' + this.generatePageSpecificAssetClassName(pageID);
     }
-    return asset;
+    return className;
   },
 
-  loadJavascript : function(asset,onReady,onError) {
-    asset = this.getAsset(asset);
+  loadJavaScript : function(pageID,asset,onReady,onError) {
+    Xef.Page.bindCallbackScopeToPage(pageID);
+    asset = this.getAssetObject(asset);
     Asset.javascript(asset.url,{
-      'id' : this.generateAssetID(asset),
-      'class' : this.generateAssetClassName(asset),
-      'onload' : onReady,
-      'onerror' : onError
+      'id' : this.generateIDFromAsset(asset),
+      'class' : this.generateAssetClassName(pageID,asset),
+      'onload' : onReady
+      //'onError' : onError
     });
   },
 
-  loadStylesheet : function(asset) {
-    asset = this.getAsset(asset);
+  loadStyleSheet : function(pageID,asset,onReady,onError) {
+    Xef.Page.bindCallbackScopeToPage(pageID);
+    asset = this.getAssetObject(asset);
     Asset.stylesheet(asset.url,{
-      'id' : this.generateAssetID(asset),
-      'class' : this.generateAssetClassName(asset),
-      'onload' : onReady,
-      'onerror' : onError
+      'id' : this.generateIDFromAsset(asset),
+      'class' : this.generateAssetClassName(pageID,asset),
+      'onload' : onReady
+      //'onError' : onError
     });
   },
 
@@ -126,19 +175,19 @@ Xef.implement({
     bindEscapeKey : true,
     animateOnCreate : true,
     animateOnDestroy : true,
-    zIndexIncrement : 10,
+    zIndexIncrement : 100,
     borderWidth : 10,
-    baseZIndex : 100,
+    baseZIndex : 1000,
     adjustHeight : true,
     useLabels : true,
-    gutter : 80,
-    bindLinks : true,
+    gutter : 100,
     showLoadingOnCreate : true,
-    fadeGap : 200,
+    fadeGap : 150,
     urlFormat : 'xefjs'
   },
 
   initialize : function(container,options) {
+    Xef.registerInstance(this);
     this.container = $(container || document.body);
     this.setOptions(options);
     this.build();
@@ -174,6 +223,10 @@ Xef.implement({
     return this.container;
   },
 
+  getZIndexValue : function(index) {
+    return this.options.baseZIndex + this.options.zIndexIncrement * index;
+  },
+
   getWidth : function() {
     return this.getContainer().getSize().x - this.options.borderWidth;
   },
@@ -199,8 +252,11 @@ Xef.implement({
 
   createPage : function(name,options) {
     var x = this.getNextPageOrigin();
-    var width = this.calculatePageWidth(this.getNextPageIndex());
-    var page = new Xef.Page(name,this.getContainer(),width);
+    var index = this.getNextPageIndex();
+    var zIndex = this.getZIndexValue(index);
+    var width = this.calculatePageWidth(index);
+    var page = new Xef.Page(name,this.getContainer(),width,zIndex);
+    page.setLevel(index);
     this.addPage(page);
 
     if(this.options.showLoadingOnCreate) {
@@ -209,7 +265,7 @@ Xef.implement({
 
     page.setOrigin(x);
     this.bindPageEvents(page);
-    this.onPageCreate(page);
+    this.onPageCreate(page,index);
     page.focus();
     return page;
   },
@@ -322,26 +378,29 @@ Xef.implement({
     var result = this.getPages().filter(function(page) {
       return page.getID()==id;
     });
-    return result.length == 1 ? result[1] : null;
+    return result.length == 1 ? result[0] : null;
   },
 
   onEscape : function() {
     this.getTipPage().destroy();
   },
 
-  onPageCreate : function(page) {
-    if(this.options.animateOnCreate) {
+  onPageCreate : function(page,index) {
+    if(index > 0 && this.options.animateOnCreate) {
       var x = page.getOrigin() + this.options.fadeGap;
       page.moveTo(x);
-      page.show();
       page.slideToOrigin();
     }
     else {
+      page.moveToOrigin();
       page.show();
     }
   },
 
   onPageDestroy : function(page) {
+    if(!page.options.keepAssetsAfterDestroy) {
+      Xef.clearAssets(page.getID());
+    }
     if(this.options.animateOnDestroy) {
       var x = page.getLeft() + 200;
       page.fadeTo(x).chain(this.destroyPage.bind(this));
@@ -376,9 +435,63 @@ Xef.Page.extend({
 
   KLASS : 'xef-page',
 
+  callbacks : {},
+
   createFromContent : function(element,options) {
     var frameContainer = element.getParent();
-  } 
+  },
+
+  bindCallbackScopeToPage : function(pageID) {
+    this._on = this._on ? this._on : this.on;
+    this.on = function(events) {
+      this._on.apply(this,[events,pageID]);
+    }.bind(this)
+  },
+
+  on : function(events,pageID) {
+    if(!pageID) {
+      var manager = Xef.getInstance();
+      var page = manager.getTipPage();
+      var id = page.getID();
+    }
+    this.registerCallbacks(pageID,events);
+  },
+
+  onReady : function(fn,pageID) {
+    this.on({
+      ready : fn
+    },pageID);
+  },
+
+  registerCallbacks : function(pageID,events) {
+    if(!this.callbacks[pageID]) {
+      this.callbacks[pageID] = {};
+    }
+
+    for(var type in events) {
+      var fn = events[type];
+      this.callbacks[pageID][type] = this.callbacks[pageID][type] || [];
+      this.callbacks[pageID][type].push(fn);
+    }
+  },
+
+  fireCallbacks : function(pageID,type) {
+    var manager = Xef.getInstance();
+    var page = manager.getPageByID(pageID);
+    if(this.callbacks[pageID]) {
+      if(this.callbacks[pageID][type]) {
+        var scope = this.callbacks[pageID][type];
+        var methods = this.callbacks[pageID][type] || [];
+        methods.each(function(fn) {
+          fn.apply(scope,[page,pageID]);
+        });
+      }
+    }
+  },
+
+  clearCallbacks : function(pageID) {
+    this.callbacks[pageID]=null;
+  }
 
 });
 
@@ -390,20 +503,29 @@ Xef.Page.implement({
     hoverClassName : 'hover',
     disabledClassName : 'disabled',
     activatedClassName : 'active',
-    fxOptions : {},
-    bindLinks : true
+    loadAssets : true,
+    keepAssetsAfterDestroy : false,
+    fxOptions : {
+      link : 'cancel',
+      transition : 'circ:out'
+    }
   },
 
-  initialize : function(name,frameContainer,maxWidth,options) {
+  initialize : function(name,frameContainer,maxWidth,zIndex,options) {
     this.setOptions(options);
     this.name = name;
     this.maxWidth = maxWidth;
+    this.zIndex = zIndex;
     this.id = name + '-' + (new Date().getTime());
     this.parent = document.id(frameContainer);
     this.build(this.parent);
+    this.hide();
     this.setupEvents();
     this.resize();
-    this.hide();
+  },
+
+  setLevel : function(level) {
+    this.getContainer().addClass('xef-page-level-'+level);
   },
 
   build : function(frameContainer) {
@@ -415,7 +537,8 @@ Xef.Page.implement({
         'top':0,
         'width':this.maxWidth,
         'opacity':0,
-        'min-height':'100%'
+        'min-height':'100%',
+        'z-index':this.zIndex
       }
     }).inject(frameContainer);
 
@@ -455,35 +578,6 @@ Xef.Page.implement({
     });
   },
 
-  bindLinks : function() {
-    this.getContainer().addEvent('click:relay(a)',this.onLinkClick.bind(this));
-  },
-
-  isValidLink : function(target) {
-    var href = element.get('href');
-    if(href == '' || href == '#' || href.match(/^\w+:\/\//)) {
-      return false;
-    }
-
-    if(element.retrieve('Xef:ignore')) {
-      return false;
-    }
-
-    var target = element.get('target');
-    if(target.length > 0) {
-      return false;
-    }
-
-    return true;
-  },
-
-  onLinkClick : function(event,target) {
-    if(this.isValidLink(target)) {
-      event.stop();
-      this.fireEvent('click',[target]);
-    }
-  },
-
   getParent : function() {
     return this.parent;
   },
@@ -505,16 +599,35 @@ Xef.Page.implement({
   },
 
   onReady : function() {
-    this.hideLoading();
+    this.positionTab();
+    this.resize();
+    this.fireCallbacks('ready');
     this.fireEvent('ready',[this]);
+
+    if(this.isAnimating()) {
+      this.addEvent('animationComplete:once',this.onEnabledAndReady.bind(this));
+    }
+    else {
+      this.onEnabledAndReady();
+    }
+  },
+
+  onEnabledAndReady : function() {
+    this.hideLoading();
   },
 
   onFailure : function() {
-    alert('failure');
+    this.destroy();
   },
 
   onResponse : function(response) {
     this.setResponse(response);
+    if(this.options.loadAssets) {
+      this.getRequest().loadAssets(this.getID());
+    }
+    else {
+      this.onReady();
+    }
   },
 
   getName : function() {
@@ -600,23 +713,36 @@ Xef.Page.implement({
   },
 
   disable : function() {
-    var container = this.getContainer();
-    var x = container.getPosition().x;
-    container.setStyles({
-      'position':'fixed',
-      'left':x
-    });
-    container.addClass(this.options.disabledClassName).removeClass(this.options.activatedClassName);
+    if(!this.isAnimating()) {
+      var container = this.getContainer();
+      var x = container.getPosition().x;
+      container.setStyles({
+        'position':'fixed',
+        'left':x
+      });
+      container.addClass(this.options.disabledClassName).removeClass(this.options.activatedClassName);
+      this.onDisable();
+    }
+    else {
+      this.addEvent('animationComplete:once',this.disable.bind(this));
+    }
   },
 
   enable : function() {
-    var container = this.getContainer();
-    var x = this.getOrigin();
-    container.setStyles({
-      'position':'absolute',
-      'left':x
-    });
-    container.removeClass(this.options.disabledClassName).addClass(this.options.activatedClassName);
+    if(!this.isAnimating()) {
+      var container = this.getContainer();
+      var x = this.getOrigin();
+      container.setStyles({
+        'position':'absolute',
+        'left':x
+      });
+      container.removeClass(this.options.disabledClassName).addClass(this.options.activatedClassName);
+      container.removeClass(this.options.hoverClassName);
+      this.onEnable();
+    }
+    else {
+      this.addEvent('animationComplete:once',this.enable.bind(this));
+    }
   },
 
   focus : function() {
@@ -652,10 +778,17 @@ Xef.Page.implement({
   },
 
   onEnable : function() {
+    this.positionTab();
+    this.resize();
+    this.clearNotification();
+    this.fireCallbacks('enable');
     this.fireEvent('enable');
   },
 
   onDisable : function() {
+    this.positionTab();
+    this.resize();
+    this.fireCallbacks('disable');
     this.fireEvent('disable');
   },
 
@@ -670,12 +803,21 @@ Xef.Page.implement({
   getFx : function() {
     if(!this.fx) {
       this.fx = new Fx.Morph(this.getContainer(),this.options.fxOptions);
+      this.fx.addEvent('complete',function() {
+        this.animating = false;
+        this.fireEvent('animationComplete');
+      }.bind(this));
+      this.fx.addEvent('start',function() {
+        this.animating = true;
+      }.bind(this));
     }
     return this.fx;
   },
 
   slideTo : function(x) {
-    this.getFx().start({
+    this.getFx().set({
+      'display':'block'
+    }).start({
       'left':x,
       'opacity':[0,1]
     }).chain(function() {
@@ -698,12 +840,16 @@ Xef.Page.implement({
     this.getContainer().setStyle('left',x);
   },
 
+  moveToOrigin : function() {
+    this.moveTo(this.getOrigin());
+  },
+
   slideToOrigin : function() {
     this.slideTo(this.getOrigin());
   },
 
   show : function() {
-    this.getContainer().setStyle('display','block');
+    this.getContainer().setStyle('display','block').setOpacity(1);;
   },
 
   hide : function() {
@@ -740,7 +886,29 @@ Xef.Page.implement({
   },
 
   destroy : function() {
+    this.positionTab();
+    this.resize();
+    this.fireCallbacks('destroy');
+    Xef.Page.clearCallbacks(this.getID());
     this.fireEvent('destroy',[this]);
+  },
+
+  notify : function() {
+    if(this.isDisabled()) {
+      this.getContainer().addClass('notify');
+    }
+  },
+
+  clearNotification : function() {
+    this.getContainer().removeClass('notify');
+  },
+
+  fireCallbacks : function(type) {
+    Xef.Page.fireCallbacks(this.getID(),type);
+  },
+
+  isAnimating : function() {
+    return this.animating;
   }
 
 });
@@ -923,6 +1091,14 @@ Xef.Page.Request = new Class({
     this.fireEvent('cancel');
   },
 
+  getResponse : function() {
+    return this.response;
+  },
+
+  getAssets : function() {
+    return this.getResponse().getAssets();
+  },
+
   onResponse : function(content) {
     this.response = new Xef.Page.Response(content);
     if(this.response.isFailure()) {
@@ -931,22 +1107,20 @@ Xef.Page.Request = new Class({
     }
 
     this.fireEvent('response',[this.response]);
-
-    var assets = this.response.getAssets();
-    if(assets.length > 0) {
-      this.loadAssets(assets,this.onAssetsReady.bind(this),this.onAssetsError.bind(this));
-    }
-    else {
-      this.onAssetsReady();
-    }
   },
 
   onFailure : function() {
     this.fireEvent('failure');
   },
 
-  loadAssets : function(assets,onReady,onError) {
-    Xef.loadAssets(assets,onReady,onError);
+  loadAssets : function(pageID) {
+    var assets = this.getAssets();
+    if(assets && assets.length > 0) {
+      Xef.loadAssets(pageID,assets,this.onAssetsReady.bind(this),this.onAssetsError.bind(this));
+    }
+    else {
+      this.onAssetsReady();
+    }
   },
 
   onAssetsReady : function() {
