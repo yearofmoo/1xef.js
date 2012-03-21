@@ -453,9 +453,12 @@ Xef.Page.extend({
 
   bindCallbackScopeToPage : function(pageID) {
     this._on = this._on ? this._on : this.on;
-    this.on = function(events) {
-      this._on.apply(this,[events,pageID]);
-    }.bind(this)
+    var fn = function(events) {
+      var pageID = arguments.callee._pageID;
+      Xef.Page._on.apply(this,[events,pageID]);
+    };
+    fn._pageID = pageID;
+    this.on = fn;
   },
 
   on : function(events,pageID) {
