@@ -433,6 +433,12 @@ Xef.implement({
 
   load : function(url,method,data) {
     this.getCurrentPage().load(url,method,data);
+  },
+
+  fireCallbacks : function(name) {
+    this.getPages.each(function(page) {
+      page.fireCallbacks(name);
+    });
   }
 
 });
