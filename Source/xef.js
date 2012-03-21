@@ -670,7 +670,29 @@ Xef.Page.implement({
     if(title) {
       this.setTabTitle(title);
     }
+
+    var className = response.getClassName() || '';
+    if(className && className.length > 0) {
+      this.setCustomClassName(className);
+    }
+
     this.setContent(container);
+  },
+
+  getCustomClassName : function() {
+    return this.customClassName;
+  },
+
+  setCustomClassName : function(className) {
+    if(this.getCustomClassName()) {
+      this.removeCustomClassName();
+    }
+    this.customClassName = className;
+    this.getContainer().addClass(className);
+  },
+
+  removeCustomClassName : function() {
+    this.getContainer().removeClass(this.getCustomClassName());
   },
 
   setContent : function(html) {
@@ -982,7 +1004,8 @@ Xef.Page.Response = new Class({
 
   parseHeader : function(header) {
     var content = header.get('html').trim();
-    this.header = JSON.decode(content);
+    var headerData = JSON.decode(content);
+    this.header = headerData['xef'];
   },
 
   getRawHTML : function() {
@@ -1007,6 +1030,10 @@ Xef.Page.Response = new Class({
 
   getTitle : function() {
     return this.getHeader('title');
+  },
+
+  getClassName : function() {
+    return this.getHeader('className');
   },
 
   getAssets : function() {

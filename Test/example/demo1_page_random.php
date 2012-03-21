@@ -23,6 +23,6 @@ echo rand_string(1000);
 ?>
   </div>
   <div class="xef-header">
-    { title : "Random Page", assets : ['./demo1_asset.js', 'demo1_asset.css'] }
+    { xef : { className : 'orange-page', title : "Random Page", assets : ['./demo1_asset.js', 'demo1_asset.css'] } }
   </div>
 </div>
