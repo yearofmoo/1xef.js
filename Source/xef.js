@@ -504,7 +504,8 @@ Xef.Page.implement({
     fxOptions : {
       link : 'cancel',
       transition : 'circ:out'
-    }
+    },
+    screenOpacity : 0.5
   },
 
   initialize : function(name,frameContainer,maxWidth,zIndex,options) {
@@ -770,10 +771,12 @@ Xef.Page.implement({
   },
 
   showLoading : function() {
+    this.hideScreen();
     this.getContainer().addClass('loading');
   },
 
   hideLoading : function() {
+    this.hideScreen();
     this.getContainer().removeClass('loading');
   }, 
 
@@ -791,6 +794,30 @@ Xef.Page.implement({
 
   setHeight : function(height) {
     this.getContainer().setStyle('min-height',height);
+  },
+
+  showScreen : function() {
+    this.getScreen().setStyle('display','block');
+  },
+
+  hideScreen : function() {
+    this.getScreen().setStyle('display','none');
+  },
+
+  getScreen : function() {
+    if(!this.screen) {
+      this.screen = new Element('div.xef-screen',{
+        'styles':{
+          'position':'absolute',
+          'top':0,
+          'left':0,
+          'bottom':0,
+          'right':0
+        } 
+      }).inject(this.getContainer());
+      this.screen.setOpacity(this.options.screenOpacity);
+    }
+    return this.screen;
   },
 
   disable : function() {
@@ -860,6 +887,7 @@ Xef.Page.implement({
   },
 
   onEnable : function() {
+    this.hideScreen();
     this.positionTab();
     this.resize();
     this.clearNotification();
@@ -868,6 +896,7 @@ Xef.Page.implement({
   },
 
   onDisable : function() {
+    this.showScreen();
     this.positionTab();
     this.resize();
     this.fireCallbacks('disable');
