@@ -2,6 +2,10 @@ var Xef = new Class;
 
 Xef.extend({
 
+  parameterizeString : function(str) {
+    return str.replace(/[-_\W\s\.]+/g,' ').trim().toLowerCase().replace(/\s+/g,'-');
+  },
+
   loadAssets : function(pageID,assets,stamp,onReady,onError) {
     Xef.Assets.loadAssets(pageID,assets,stamp,onReady,onError);
   },
@@ -50,7 +54,7 @@ Xef.Assets = {
   },
 
   parameterizeAssetString : function(url) {
-    return url.replace(/[-_\W\s\.]+/g,' ').trim().toLowerCase().replace(/\s+/g,'-');
+    return Xef.parameterizeString(url);
   },
 
   loadAssets : function(pageID,assets,stamp,onReady,onError) {
@@ -546,7 +550,7 @@ Xef.Page.implement({
   },
 
   generateID : function(name) {
-    return name + '-' + (new Date().getTime());
+    return (name ? Xef.parameterizeString(name) : 'xef-page') + '-' + (new Date().getTime());
   },
 
   setLevel : function(level) {
@@ -730,6 +734,7 @@ Xef.Page.implement({
   },
 
   load : function(url,method,data) {
+    this.onBeforeDestroy();
     this.getRequest().load(url,method,data);
   },
 
@@ -1020,11 +1025,14 @@ Xef.Page.implement({
     return this.getContainer();
   },
 
+  onBeforeDestroy : function() {
+    this.fireCallbacks('destroy');
+    this.clearCallbacks();
+  },
+
   destroy : function() {
     this.positionTab();
     this.resize();
-    this.fireCallbacks('destroy');
-    Xef.Page.clearCallbacks(this.getID());
     this.fireEvent('destroy',[this]);
   },
 
@@ -1036,6 +1044,10 @@ Xef.Page.implement({
 
   clearNotification : function() {
     this.getContainer().removeClass('notify');
+  },
+
+  clearCallbacks : function() {
+    Xef.Page.clearCallbacks(this.getID());
   },
 
   fireCallbacks : function(type) {
