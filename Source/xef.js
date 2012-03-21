@@ -436,7 +436,7 @@ Xef.implement({
   },
 
   fireCallbacks : function(name) {
-    this.getPages.each(function(page) {
+    this.getPages().each(function(page) {
       page.fireCallbacks(name);
     });
   }
