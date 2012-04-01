@@ -155,7 +155,7 @@ Xef.Assets = {
   loadStyleSheet : function(pageID,asset,onReady,onError) {
     Xef.Page.bindCallbackScopeToPage(pageID);
     asset = this.getAssetObject(asset);
-    Asset.stylesheet(asset.url,{
+    Asset.css(asset.url,{
       'id' : this.generateIDFromAsset(asset),
       'class' : this.generateAssetClassName(pageID,asset),
       'onload' : onReady
