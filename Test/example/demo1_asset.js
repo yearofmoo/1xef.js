@@ -1,6 +1,7 @@
 Xef.Page.on({
   
   ready : function(page,pageID) {
+    alert('ready');
   },
 
   enable : function() {
