@@ -229,6 +229,10 @@ Xef.implement({
     return this.container;
   },
 
+  getCurrentZIndexValue : function() {
+    return this.getCurrentPage().getZIndexValue();
+  },
+
   getZIndexValue : function(index) {
     return this.options.baseZIndex + this.options.zIndexIncrement * index;
   },
@@ -554,6 +558,10 @@ Xef.Page.implement({
     this.hide();
     this.setupEvents();
     this.resize();
+  },
+
+  getZIndexValue : function() {
+    return this.getContainer().getStyle('z-index');
   },
 
   generateID : function(name) {
