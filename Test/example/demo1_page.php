@@ -21,6 +21,6 @@
 <p>Aenean ut ipsum purus. Quisque sem lacus, dictum in auctor et, varius et dui. Nam rhoncus tellus eu mi vestibulum vitae volutpat eros dictum. Pellentesque augue orci, sodales ac facilisis eget, posuere id risus. Pellentesque blandit tincidunt est, id venenatis est venenatis ac. Donec in sem at diam facilisis consequat. Vivamus lacinia leo arcu. Curabitur sed nibh at libero convallis gravida. Mauris varius ligula et turpis tempor commodo. Aenean mattis pretium felis sed aliquet. Curabitur odio purus, hendrerit id rhoncus id, vulputate in neque. Nunc lacinia augue quis magna lacinia et porttitor orci elementum.</p>
   </div>
   <div class="xef-header">
-    { xef : { title : "Hello", assets : ['./demo1_asset.js'] } }
+    { xef : { title : "Hello", assets : ['./demo1_asset.js?123'] } }
   </div>
 </div>

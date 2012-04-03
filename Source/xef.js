@@ -180,6 +180,7 @@ Xef.implement({
     recognizeExistingChildren : true,
     animateOnCreate : true,
     animateOnDestroy : true,
+    scrollToTopOnFocus : true,
     zIndexIncrement : 100,
     borderWidth : 10,
     baseZIndex : 1000,
@@ -191,6 +192,9 @@ Xef.implement({
     urlFormat : 'xefjs',
     assetStamp : null,
     pageOptions : {
+
+    },
+    scrollerOptions : {
 
     }
   },
@@ -289,7 +293,17 @@ Xef.implement({
     });
   },
 
+  getScroller : function() {
+    if(!this.scroller) {
+      this.scroller = new Fx.Scroll(window,this.options.scrollerOptions);
+    }
+    return this.scroller;
+  },
+
   onPageFocus : function(page) {
+    if(this.options.scrollToTopOnFocus) {
+      this.getScroller().toTop();
+    }
     this.setCurrentPage(page);
   },
 
