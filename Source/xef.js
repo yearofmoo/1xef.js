@@ -524,8 +524,8 @@ Xef.Page.implement({
   initialize : function(name,frameContainer,maxWidth,zIndex,options) {
     this.setOptions(options);
     this.parent = document.id(frameContainer);
-    this.maxWidth = 1000;
-    //this.maxWidth = maxWidth;
+    //this.maxWidth = 1000;
+    this.maxWidth = maxWidth;
     this.zIndex = zIndex;
 
     if(typeOf(name) == 'element') {
