@@ -1,3 +1,6 @@
 [submodule "Source/MooTools-Asset.css-patch"]
 	path = Source/MooTools-Asset.css-patch
 	url = git://github.com/matsko/MooTools-Asset.css-patch.git
+[submodule "Source/XView.js"]
+	path = Source/XView.js
+	url = git://github.com/matsko/XView.js.git

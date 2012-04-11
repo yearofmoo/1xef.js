@@ -196,10 +196,13 @@ Xef.implement({
     },
     scrollerOptions : {
 
-    }
+    },
   },
 
   initialize : function(container,options) {
+    if(!window.XView) {
+      throw new Error('xef.js: XView is not found');
+    }
     Xef.registerInstance(this);
     this.container = $(container || document.body);
     this.setOptions(options);
@@ -524,6 +527,8 @@ Xef.Page.extend({
 
 Xef.Page.implement({
 
+  Binds : ['onRequest','onResponse','onReady','onFailure'],
+
   Implements : [Options, Events, Chain],
 
   options : {
@@ -536,7 +541,9 @@ Xef.Page.implement({
       link : 'cancel',
       transition : 'circ:out'
     },
-    screenOpacity : 0.5
+    screenOpacity : 0.5,
+    requestOptions : {
+    }
   },
 
   initialize : function(name,frameContainer,maxWidth,zIndex,options) {
@@ -678,11 +685,12 @@ Xef.Page.implement({
 
   getRequest : function() {
     if(!this.request) {
-      this.request = new Xef.Page.Request({
-        onRequest : this.onRequest.bind(this),
-        onResponse : this.onResponse.bind(this),
-        onReady : this.onReady.bind(this),
-        onFailure : this.onFailure.bind(this)
+      this.request = new Xef.Page.Request(this.options.requestOptions);
+      this.request.addEvents({
+        request : this.onRequest,
+        response : this.onResponse,
+        ready : this.onReady,
+        failure : this.onFailure
       });
     }
     return this.request;
@@ -1075,141 +1083,17 @@ Xef.Page.implement({
 
 });
 
-Xef.Page.Response = new Class({
-
-  Implements : [Options],
-
-  options : {
-    fallback : true,
-    contentSelector : '.xef-content',
-    headerSelector : '.xef-header'
-  },
-
-  initialize : function(html) {
-    this.html = html;
-    this.parse(html);
-  },
-
-  parse : function(html) {
-    if(!html || typeOf(html) != 'string' || html.length == 0) {
-      this.onEmpty();
-      return;
-    }
-
-    var element = Elements.from(html);
-    element = ['elements','array'].indexOf(typeOf(element)) >= 0 ? element[0] : element;
-    if(typeOf(element)=='null') {
-      element = new Element('div').set('html',html);
-    }
-
-    try {
-      this.element = element;
-
-      var content = this.element.getElement(this.options.contentSelector); 
-      if(!content) {
-        throw new Error;
-      }
-
-      this.parseContent(content);
-
-      var header = element.getElement(this.options.headerSelector); 
-      if(!header) {
-        throw new Error;
-      }
-
-      this.parseHeader(header);
-    }
-    catch(e) {
-      if(this.options.fallback && element) {
-        this.fallback(element);
-      }
-      else {
-        this.onFailure();
-      }
-    }
-  },
-
-  fallback : function(element) {
-    this.content = element;
-    this.header = {};
-  },
-
-  getElement : function() {
-    return this.element;
-  },
-
-  parseContent : function(content) {
-    return this.content = content;
-  },
-
-  parseHeader : function(header) {
-    var content = header.get('html').trim();
-    var headerData = JSON.decode(content);
-    this.header = headerData['xef'];
-    header.destroy();
-  },
-
-  getRawHTML : function() {
-    return this.html;
-  },
-
-  getHTML : function() {
-    return this.contentHTML;
-  },
-
-  getContent : function() {
-    return this.content;
-  },
-
-  getHeaderContent : function() {
-    return this.header;
-  },
-
-  getHeader : function(header) {
-    return this.getHeaderContent()[header];
-  },
-
-  getTitle : function() {
-    return this.getHeader('title');
-  },
-
-  getClassName : function() {
-    return this.getHeader('className');
-  },
-
-  getAssets : function() {
-    return this.getHeader('assets') || [];
-  },
-
-  isFailure : function() {
-    return this.failure;
-  },
-
-  onFailure : function() {
-    this.failure = true;
-  },
-
-  isEmpty : function() {
-    return this.empty;
-  },
-
-  toElement : function() {
-    return this.content;
-  },
-
-  onEmpty : function() {
-    this.empty = true;
-  },
-
-  destroy : function() {
-
-  }
-
-});
-
 Xef.Page.Request = new Class({
 
   Implements : [Options, Events],
+
+  options : {
+    xviewOptions : {
+      rootClassName : 'xef-response',
+      contentSelector : '.xef-content',
+      headerSelector : '.xef-header'
+    }
+  },
 
   initialize : function(options) {
     this.setOptions(options);
@@ -1268,7 +1152,7 @@ Xef.Page.Request = new Class({
   },
 
   onResponse : function(content) {
-    this.response = new Xef.Page.Response(content);
+    this.response = new XView(content,this.options.xviewOptions);
     if(this.response.isFailure()) {
       this.onFailure();
       return;
