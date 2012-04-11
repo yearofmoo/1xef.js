@@ -543,6 +543,14 @@ Xef.Page.implement({
     },
     screenOpacity : 0.5,
     requestOptions : {
+    },
+    requestLoader : 'spinner',
+    spinnerOptions : {
+      zIndexIncrement : 100,
+      'class' : 'xef-spinner',
+      style : {
+        opacity : 0.8
+      }
     }
   },
 
@@ -814,6 +822,32 @@ Xef.Page.implement({
     return this.getContainer().get('html');
   },
 
+  showSpinner : function() {
+    this.getSpinner().show();
+  },
+
+  hideSpinner : function() {
+    this.getSpinner().hide();
+  },
+
+  getSpinner : function() {
+    if(!this.spinner) {
+      var options = this.options.spinnerOptions;
+      if(options.zIndexIncrement) {
+        var zIndex = this.getZIndexValue().toInt() +  options.zIndexIncrement;
+        delete this.options.spinnerOptions.zIndexIncrement;
+        options.style = options.style || {};
+        options.style['z-index'] = zIndex;
+      }
+      this.spinner = new Spinner(this.getContainer(),options);
+    }
+    return this.spinner;
+  },
+
+  updateSpinner : function() {
+    this.getSpinner().position();
+  },
+
   showLoading : function() {
     this.hideScreen();
     this.getContainer().addClass('loading');
@@ -1056,6 +1090,7 @@ Xef.Page.implement({
   destroy : function() {
     this.positionTab();
     this.resize();
+    this.getSpinner().destroy();
     this.fireEvent('destroy',[this]);
   },
 
@@ -1147,8 +1182,18 @@ Xef.Page.Request = new Class({
     return this.response;
   },
 
+  getResponseData : function() {
+    return this.responseData;
+  },
+
   getAssets : function() {
-    return this.getResponse().getAssets();
+    var assets = this.getResponseData()['assets'];
+    if(assets) {
+      assets = typeOf(assets) == 'array' ? assets : [assets];
+      if(assets.length > 0 && assets[0] != null) {
+        return assets;
+      }
+    }
   },
 
   onResponse : function(content) {
@@ -1158,6 +1203,7 @@ Xef.Page.Request = new Class({
       return;
     }
 
+    this.responseData = this.response.getHeader('xef');
     this.fireEvent('response',[this.response]);
   },
 

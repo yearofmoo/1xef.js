@@ -8,6 +8,10 @@
   opacity:1!important;
 }
 
+.xef-spinner {
+  background:url(./images/loading.gif) center 200px white no-repeat;
+}
+
 .xef-page.notify:after {
   content:"!";
   position:absolute;
