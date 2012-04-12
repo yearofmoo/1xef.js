@@ -352,6 +352,14 @@ Xef.implement({
     return this.getPage(this.getCurrentPageIndex());
   },
 
+  getPreviousPageIndex : function() {
+    return Math.max(0,this.getCurrentPageIndex());
+  },
+
+  getPreviousPage : function() {
+    return this.getPage(this.getPreviousPageIndex());
+  },
+
   getTotalPages : function() {
     return this.getPages().length;
   },
@@ -705,10 +713,16 @@ Xef.Page.implement({
   },
 
   onRequest : function() {
-    this.showLoading();
+    if(this.options.requestLoader == 'spinner' && this.hasRequestedBefore()) {
+      this.showSpinner();
+    }
+    else {
+      this.showLoading();
+    }
   },
 
   onReady : function() {
+    this.requestedBefore = true;
     this.positionTab();
     this.resize();
     this.fireCallbacks('ready');
@@ -723,6 +737,7 @@ Xef.Page.implement({
   },
 
   onEnabledAndReady : function() {
+    this.hideSpinner();
     this.hideLoading();
   },
 
@@ -761,12 +776,17 @@ Xef.Page.implement({
   },
 
   reload : function() {
+    this.onBeforeDestroy();
     this.getRequest().reload();
   },
 
   load : function(url,method,data) {
     this.onBeforeDestroy();
     this.getRequest().load(url,method,data);
+  },
+
+  postRequest : function(url,data) {
+    this.load(url,'POST',data);
   },
 
   getURL : function() {
@@ -823,6 +843,7 @@ Xef.Page.implement({
   },
 
   showSpinner : function() {
+    this.updateSpinner();
     this.getSpinner().show();
   },
 
@@ -1059,6 +1080,10 @@ Xef.Page.implement({
 
   isVisible : function() {
     return ! this.isHidden();
+  },
+
+  hasRequestedBefore : function() {
+    return this.requestedBefore;
   },
 
   equals : function(page) {
