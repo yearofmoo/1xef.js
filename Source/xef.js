@@ -546,6 +546,7 @@ Xef.Page.implement({
   Implements : [Options, Events, Chain],
 
   options : {
+    followRedirects : true,
     hoverClassName : 'hover',
     disabledClassName : 'disabled',
     activatedClassName : 'active',
@@ -727,6 +728,11 @@ Xef.Page.implement({
     }
   },
 
+  onRedirect : function(url) {
+    this.fireEvent('redirect',[url]);
+    this.load(url);
+  },
+
   onReady : function() {
     this.requestedBefore = true;
     this.positionTab();
@@ -751,9 +757,13 @@ Xef.Page.implement({
     this.destroy();
   },
 
-  onResponse : function(response) {
+  onResponse : function(response, data) {
     this.setResponse(response);
-    if(this.options.loadAssets) {
+    var redirect = data['redirect'];
+    if(this.options.followRedirects && redirect && redirect.length > 0) {
+      this.onRedirect(redirect);
+    }
+    else if(this.options.loadAssets) {
       this.getRequest().loadAssets(this.getID(),this.options.assetStamp);
     }
     else {
@@ -1235,7 +1245,7 @@ Xef.Page.Request = new Class({
     }
 
     this.responseData = this.response.getHeader('xef');
-    this.fireEvent('response',[this.response]);
+    this.fireEvent('response',[this.response, this.responseData]);
   },
 
   onFailure : function() {

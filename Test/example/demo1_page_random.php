@@ -4,7 +4,6 @@
 ?>
 <div class="xef-response">
   <div class="xef-content">
-    <a href="#" id="spin">Show Spinner</a>
 <?php
 
 function rand_string( $length ) {
@@ -24,6 +23,6 @@ echo rand_string(1000);
 ?>
   </div>
   <div class="xef-header">
-    { xef : { className : 'orange-page', title : "Random Page", assets : ['./demo1_asset.js?23123512a31236123', 'demo1_asset.css'] } }
+    { xef : { redirect : './redirect_page.php' } }
   </div>
 </div>
