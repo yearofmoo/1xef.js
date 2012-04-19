@@ -181,6 +181,7 @@ Xef.implement({
     animateOnCreate : true,
     animateOnDestroy : true,
     scrollToTopOnFocus : true,
+    animateScroll : false,
     zIndexIncrement : 100,
     borderWidth : 10,
     baseZIndex : 1000,
@@ -309,9 +310,14 @@ Xef.implement({
 
   onPageFocus : function(page) {
     if(this.options.scrollToTopOnFocus) {
-      this.getScroller().toTop();
+      this.scrollToTop();
     }
     this.setCurrentPage(page);
+  },
+
+  scrollToTop : function() {
+    var scroller = this.getScroller();
+    this.options.animateScroll ? scroller.toTop() : scroller.set(0,0);
   },
 
   onPageBlur : function(page) {
