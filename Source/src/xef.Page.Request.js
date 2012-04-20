@@ -1,6 +1,6 @@
 Xef.Page.Request = new Class({
 
-  Binds : ['onCancel','onRequest','onResponse','onFailure'],
+  Binds : ['onCancel','onRequest','onResponse','onFailure','onReady','onAssetsReady','onAssetsError'],
 
   Implements : [Options, Events],
 
@@ -129,7 +129,9 @@ Xef.Page.Request = new Class({
   loadAssets : function(pageID,stamp) {
     var assets = this.getAssets();
     if(assets && assets.length > 0) {
-      Xef.loadAssets(pageID,assets,stamp,this.onAssetsReady.bind(this),this.onAssetsError.bind(this));
+      Xef.Assets.load(assets,pageID,{
+        onReady : this.onAssetsReady
+      });
     }
     else {
       this.onAssetsReady();
