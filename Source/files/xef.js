@@ -2,6 +2,8 @@ var Xef = new Class;
 
 Xef.extend({
 
+  ASSET_CLASS_NAME : 'xef-page-specific',
+
   parameterizeString : function(str) {
     return str.replace(/[-_\W\s\.]+/g,' ').trim().toLowerCase().replace(/\s+/g,'-');
   },
@@ -15,7 +17,7 @@ Xef.extend({
   },
 
   clearAllAssets : function(pageID) {
-    $$('.xef-page-specific').destroy();
+    $$('.' + this.ASSET_CLASS_NAME).destroy();
   },
 
   getInstance : function() {

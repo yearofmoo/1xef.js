@@ -24,6 +24,6 @@ echo rand_string(1000);
 ?>
   </div>
   <div class="xef-header">
-    { xef : { collapse : 'honies', collapseContent : 'reload' } }
+    { xef : { assets : ['./demo1_asset.js?941'] } }
   </div>
 </div>

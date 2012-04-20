@@ -105,7 +105,7 @@ Xef.Assets = {
     asset = this.getAssetObject(asset);
     var className = 'xef-asset xef-asset-' + asset.type;
     if(asset.pageSpecific) {
-      className += ' xef-page-specific';
+      className += ' ' + Xef.ASSET_CLASS_NAME;
       className += ' ' + this.generatePageSpecificAssetClassName(pageID);
     }
     return className;

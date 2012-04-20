@@ -1,10 +1,7 @@
 Xef.Page.on({
   
   ready : function(page,pageID) {
-    $(page).getElement('#spin').addEvent('click',function(event) {
-      event.stop();
-      page.reload();
-    });
+    alert('asset loaded');
   },
 
   enable : function() {

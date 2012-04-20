@@ -2,6 +2,8 @@ var Xef = new Class;
 
 Xef.extend({
 
+  ASSET_CLASS_NAME : 'xef-page-specific',
+
   parameterizeString : function(str) {
     return str.replace(/[-_\W\s\.]+/g,' ').trim().toLowerCase().replace(/\s+/g,'-');
   },
@@ -15,7 +17,7 @@ Xef.extend({
   },
 
   clearAllAssets : function(pageID) {
-    $$('.xef-page-specific').destroy();
+    $$('.' + this.ASSET_CLASS_NAME).destroy();
   },
 
   getInstance : function() {
@@ -530,7 +532,7 @@ Xef.Assets = {
     asset = this.getAssetObject(asset);
     var className = 'xef-asset xef-asset-' + asset.type;
     if(asset.pageSpecific) {
-      className += ' xef-page-specific';
+      className += ' ' + Xef.ASSET_CLASS_NAME;
       className += ' ' + this.generatePageSpecificAssetClassName(pageID);
     }
     return className;
