@@ -9,7 +9,7 @@ src:
 
 jsmin:
   filters:
-    - cat Source/%{input} | jsmin > %{output}
+    - cat Source/xef.js | jsmin > %{output}
   input:
   - Source/xef.js
   output:
