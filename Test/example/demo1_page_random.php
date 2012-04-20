@@ -1,5 +1,6 @@
 <?php
 
+  sleep(10);
 
 ?>
 <div class="xef-response">
@@ -23,6 +24,6 @@ echo rand_string(1000);
 ?>
   </div>
   <div class="xef-header">
-    { xef : { redirect : './redirect_page.php' } }
+    { xef : { collapse : 'honies', collapseContent : 'reload' } }
   </div>
 </div>

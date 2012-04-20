@@ -10,6 +10,15 @@
 <link rel="stylesheet" type="text/css" media="all" href="/stylesheets/ie.css" />
 <![endif]--> 
 <style type="text/css">
+#page-menu a {
+  display:block;
+  padding:5px;
+  font-size:1.2em;
+  border-bottom:1px solid #ddd;
+}
+#page-menu a:hover {
+  background:white;
+}
 body {
   margin:0;
   padding:0;
@@ -34,7 +43,8 @@ body {
 <body id="" class=""> 
   <div id="wrapper">
     <div id="page-menu">
-      <a id="new-page" href="#">New Page</a>
+      <a id="new-page" href="#">New Page 1</a>
+      <a id="new-page2" href="#">New Page 2</a>
     </div>
     <div id="page-manager">
 
@@ -62,9 +72,12 @@ body {
   </div>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/mootools/1.4.5/mootools-yui-compressed.js"></script>
 <script type="text/javascript" src="../Assets/MooTools-more.js"></script>
-<script type="text/javascript" src="../../Source/MooTools-Asset.css-patch/Source/Asset.css.js"></script>
-<script type="text/javascript" src="../../Source/XView.js/Source/XView.js"></script>
-<script type="text/javascript" src="../../Source/xef.js?123121233"></script>
+<script type="text/javascript" src="../../Source/include/MooTools-Asset.css-patch/Source/Asset.css.js"></script>
+<script type="text/javascript" src="../../Source/include/XView.js/Source/XView.js"></script>
+<script type="text/javascript" src="../../Source/files/xef.js"></script>
+<script type="text/javascript" src="../../Source/files/xef.Assets.js"></script>
+<script type="text/javascript" src="../../Source/files/xef.Page.js"></script>
+<script type="text/javascript" src="../../Source/files/xef.Page.Request.js"></script>
 <script type="text/javascript">
 window.addEvent('domready',function() {
   var manager = new Xef('page-manager',{
@@ -73,9 +86,16 @@ window.addEvent('domready',function() {
 
   $('new-page').addEvent('click',function(event) {
     event.stop();
+    var p = manager.createPage('Page #1');
     var r = new Date().getTime();
-    var p = manager.createPage(r+'oajsdoajsdoajsdojasdojasdoj aojas doajsd ');
-    p.load('./demo1_page_random.php?123');
+    p.load('./demo1_page_random.php?'+r);
+  });
+
+  $('new-page2').addEvent('click',function(event) {
+    event.stop();
+    var p = manager.createPage('Page #2');
+    var r = new Date().getTime();
+    p.load('./demo1_page.php?'+r);
   });
 
 });

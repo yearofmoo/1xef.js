@@ -1,0 +1,8 @@
+xef:
+  input:
+  - Source/files/xef.js
+  - Source/files/xef.Assets.js
+  - Source/files/xef.Page.js
+  - Source/files/xef.Page.Request.js
+  output:
+  - Source/xef.js
