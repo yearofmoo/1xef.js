@@ -1,9 +1,9 @@
 src:
   input:
-    - Source/files/xef.Base.js
-    - Source/files/xef.Assets.js
-    - Source/files/xef.Page.js
-    - Source/files/xef.Page.Request.js
+    - Source/src/xef.Base.js
+    - Source/src/xef.Assets.js
+    - Source/src/xef.Page.js
+    - Source/src/xef.Page.Request.js
   output:
     - Source/xef.js
 
