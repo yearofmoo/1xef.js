@@ -1,16 +1,16 @@
 src:
   input:
-  - Source/files/xef.Base.js
-  - Source/files/xef.Assets.js
-  - Source/files/xef.Page.js
-  - Source/files/xef.Page.Request.js
+    - Source/files/xef.Base.js
+    - Source/files/xef.Assets.js
+    - Source/files/xef.Page.js
+    - Source/files/xef.Page.Request.js
   output:
-  - Source/xef.js
+    - Source/xef.js
 
 jsmin:
   filters:
     - cat Source/xef.js | jsmin > %{output}
   input:
-  - Source/xef.js
+    - Source/xef.js
   output:
-  - Source/xef.min.js
+    - Source/xef.min.js
