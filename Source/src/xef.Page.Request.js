@@ -87,7 +87,7 @@ Xef.Page.Request = new Class({
   },
 
   getResponseData : function() {
-    return this.responseData;
+    return this.responseData || {};
   },
 
   setResponseData : function(data) {
